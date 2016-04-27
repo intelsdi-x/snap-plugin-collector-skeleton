@@ -16,4 +16,6 @@ go build
 
 `/path/to/snapctl plugin load snap-plugin-collector-skeleton`
 
+Now this plugin will show up when doing `snapctl plugin list` as well as having it's metric listed in `snapctl metric list`. 
+
 
