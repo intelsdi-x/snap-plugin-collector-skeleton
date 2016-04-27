@@ -1,0 +1,20 @@
+{
+    "version": 1,
+    "schedule": {
+        "type": "simple",
+        "interval": "1s"
+    },
+    "workflow": {
+        "collect": {
+            "metrics": {
+	     "/foo/bar/baz":{}
+	    },
+            "config": {
+                "/foo/bar/baz": {
+                    "user": "ExampleUser",
+                    "password": "ExamplePassword"
+                }
+            }
+        }
+    }
+}
