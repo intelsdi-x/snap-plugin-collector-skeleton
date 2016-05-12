@@ -24,6 +24,7 @@ import (
 
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
+	"github.com/intelsdi-x/snap/core"
 )
 
 const (
@@ -39,8 +40,8 @@ const (
 	The interface for collectPlugins defines 3 functions:
 
 	GetConfigPolicy() (*cpolicy.ConfigPolicy, error)
-	CollectMetrics([]PluginMetricType) ([]PluginMetricType, error)
-	GetMetricTypes(PluginConfigType) ([]PluginMetricType, error)
+	CollectMetrics([]MetricType) ([]MetricType, error)
+	GetMetricTypes(PluginConfigType) ([]MetricType, error)
 
 	This check will error at compile time if the interface is not implemented.
 */
@@ -55,11 +56,11 @@ type Skeleton struct {
 	CollectMetrics() will be called by snap when a task that collects one of the metrics returned from this plugins
 	GetMetricTypes() is started. The input will include a slice of all the metric types being collected.
 
-	The output is the collected metrics as plugin.PluginMetricType's and an error.
+	The output is the collected metrics as plugin.MetricType's and an error.
 */
-func (f *Skeleton) CollectMetrics(mts []plugin.PluginMetricType) ([]plugin.PluginMetricType, error) {
+func (f *Skeleton) CollectMetrics(mts []plugin.MetricType) ([]plugin.MetricType, error) {
 	// Create a slice to hold our results
-	results := []plugin.PluginMetricType{}
+	results := []plugin.MetricType{}
 	// Go through all metrics we were asked to collect
 	for _, metric := range mts {
 		// call the helper function to collect an individal metric
@@ -83,9 +84,9 @@ func (f *Skeleton) CollectMetrics(mts []plugin.PluginMetricType) ([]plugin.Plugi
 
 	The metrics returned will be advertised to users who list all the metrics and will become targetable by tasks.
 */
-func (f *Skeleton) GetMetricTypes(cfg plugin.PluginConfigType) ([]plugin.PluginMetricType, error) {
-	mts := []plugin.PluginMetricType{}
-	mts = append(mts, plugin.PluginMetricType{Namespace_: []string{"foo", "bar", "baz"}})
+func (f *Skeleton) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricType, error) {
+	mts := []plugin.MetricType{}
+	mts = append(mts, plugin.MetricType{Namespace_: core.NewNamespace("foo", "bar", "baz")})
 	return mts, nil
 }
 
@@ -165,14 +166,14 @@ func Meta() *plugin.PluginMeta {
 //
 // Because a dynamic metric (defined with a * in the namespace like /bin/foo/*/stat) can return more
 // than one result we return a slice here.
-func (f *Skeleton) collectMetric(metric plugin.PluginMetricType) ([]plugin.PluginMetricType, error) {
+func (f *Skeleton) collectMetric(metric plugin.MetricType) ([]plugin.MetricType, error) {
 	//For each metric we need to decide what data we want to return. We do this by examining the namespace
 	// and figuring out which of the MetricTypes we defined in GetMetricTypes this metric metric is targeting.
 	//
 	// This is where the bulk of the work for a collect plugin is done.
 	//
 	// For example purposese we will return a static value here.
-	mt := plugin.PluginMetricType{
+	mt := plugin.MetricType{
 		Namespace_: metric.Namespace(),
 		Version_:   metric.Version(),
 		// Data_ is type interface{} so any type can be assigned to it.
@@ -180,5 +181,5 @@ func (f *Skeleton) collectMetric(metric plugin.PluginMetricType) ([]plugin.Plugi
 		Timestamp_: time.Now(),
 	}
 
-	return []plugin.PluginMetricType{mt}, nil
+	return []plugin.MetricType{mt}, nil
 }
